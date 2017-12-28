@@ -123,7 +123,7 @@ def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
         conn.close()
 
 def modifyHostAndLaunch(domainName, collaboratorServerAddress, verbose):
-    hosts =[]
+    hosts = []
     hosts.append(domainName + ".host1." + collaboratorServerAddress)
     hosts.append(domainName + "@" + "host2." + collaboratorServerAddress)
     hosts.append(domainName + ":@" + "host3." + collaboratorServerAddress)
@@ -170,7 +170,7 @@ def modifyHostAndLaunch(domainName, collaboratorServerAddress, verbose):
                 conn.request("GET", "/", headers=header)
                 response = conn.getresponse()
                 time = time - 1
-                if time  == 0:
+                if time == 0:
                     break
             if verbose:
                 print '[+] Launch "Host: ' + str(header) + '" using HTTPS successed, response code is %s' % response.status
@@ -187,16 +187,16 @@ def malformedUriAndLaunch(domainName, collaboratorServerAddress, verbose):
     httpUrls = []
     httpUrls.append("@mailformedUri1.%s.%s" % (domainName,collaboratorServerAddress))
     httpUrls.append(":@mailformeduUri2.%s.%s" % (domainName,collaboratorServerAddress))
-    httpUrls.append('http://' + 'modifyUrl1.%s.%s' % (domainName,collaboratorServerAddress))
-    httpUrls.append('http://' + domainName + "@" + 'modifyUrl2.%s.%s' % (domainName,collaboratorServerAddress))
-    httpUrls.append('http://' + domainName + ":@" + 'modifyUrl3.%s.%s' % (domainName,collaboratorServerAddress))
+    httpUrls.append('http://' + 'mailformeduUri3.%s.%s' % (domainName,collaboratorServerAddress))
+    httpUrls.append('http://' + domainName + "@" + 'mailformeduUri4.%s.%s' % (domainName,collaboratorServerAddress))
+    httpUrls.append('http://' + domainName + ":@" + 'mailformeduUri5.%s.%s' % (domainName,collaboratorServerAddress))
 
     httpsUrls = []
     httpsUrls.append("@mailformedUri1.%s" % collaboratorServerAddress)
     httpsUrls.append(":@mailformeduUri2.%s" % collaboratorServerAddress)
-    httpsUrls.append('https://' + 'modifyUrl1.' + collaboratorServerAddress)
-    httpsUrls.append('https://' + domainName + "@" + 'modifyUrl2.' + collaboratorServerAddress)
-    httpsUrls.append('https://' + domainName + ":@" + 'modifyUrl3.' + collaboratorServerAddress)
+    httpsUrls.append('https://' + 'mailformeduUri3.' + collaboratorServerAddress)
+    httpsUrls.append('https://' + domainName + "@" + 'mailformeduUri4.' + collaboratorServerAddress)
+    httpsUrls.append('https://' + domainName + ":@" + 'mailformeduUri5.' + collaboratorServerAddress)
 
 
     print '[!] Firing at %s with Host overridding usring HTTP' % domainName
@@ -290,7 +290,7 @@ def main():
         if os.path.exists(file):
             pass
         else:
-            print '[-] File not exist, quitting...'
+            print '[-] File not exist, existing...'
             exit(0)
 
         for line in open(file):
