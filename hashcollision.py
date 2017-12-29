@@ -4,6 +4,7 @@ import hashlib
 import base64
 from optparse import OptionParser
 
+
 class Permutation():
 	def __init__(self, arr, mode):
 		self.arr = arr
@@ -15,14 +16,19 @@ class Permutation():
 		self.mode = mode
 		self.result = []
 		self.split_str = []
+		#used for fast mode
 		self.split_str_normal = ['', ' ', '_', '|',  ":"]
+		#used for slow mode
 		self.split_str_large = ['',' ','`','~','!','@','#','$','%','^','&','*',"-",'_','+','=','|',";",":",'{}','[]','()']
+
 
 	def swap(self, i, j):
 		temp = self.arr[i]
 		self.arr[i] = self.arr[j]
 		self.arr[j] = temp
 
+
+	#flag = extraonly, 即只使用用户提供的分隔符
 	def addSplitStr(self, arr, flag, mode):
 		if(mode == 1):
 			self.split_str = self.split_str_normal
@@ -34,6 +40,8 @@ class Permutation():
 		else:
 			self.split_str.extend(arr)
 
+
+	#将数组中的所有元素以任意顺序进行组合
 	def arrange(self, start, end):
 		if(start==end):
 			self.result.append(tuple(self.arr))
@@ -43,6 +51,7 @@ class Permutation():
 				self.arrange(start+1,end)
 				self.swap(i,start)
 		return self.result
+
 
 	def Combination(self):
 		temp = []
@@ -141,8 +150,8 @@ if __name__ == '__main__':
 	parser.add_option('--hash', dest='hash', type='string', help='the target hash to collision')
 	parser.add_option('--extra', dest='extra', type='string',help='manually specify extra separators, separated by comma')
 	parser.add_option('--extraonly', dest='extraonly', action='store_true', help='tell program to use manually separators only')
-	parser.add_option("--mode", dest='mode', type='int', help='specify the running mode\r\n\t0--default mode\r\n\t1--detailed mode\r\n\t2--comprehensive mode')
-	parser.add_option('-v','--verbose', dest='verbose', type='int', help="specify the verbosity level, default is 0, chose")
+	parser.add_option("--mode", dest='mode', type='int', help='specify the running mode\t1--fast mode\t2--slow mode(more tests)')
+	parser.add_option('-v','--verbose', dest='verbose', type='int', help="specify the verbosity level, default is 0")
 
 	(options, args) = parser.parse_args()
 	if(options.hash == None):
@@ -152,27 +161,37 @@ if __name__ == '__main__':
 		print 'You must specify params to generate hash...'
 		exit(0)
 
+	extra = options.extra
+	mode = options.mode
+	extraonly = options.extraonly
+	param = options.params
 	res = None
 	try:
-		if(options.extra != None):
-			if(options.extraonly != None):
-				options.extraonly = True
-				print '[!] You are chosing extraonly mode...'
-			else:
-				options.extraonly = False
+		if extraonly == None:
+			extraonly == False
 
-		if (options.mode == None or options.mode == 1):
-			options.mode = 1
-			if options.extraonly == False:
-				print '[!] You are chosing fast mode...'
+		if(extra != None):
+			extra = extra.split(",")
+			if(extraonly == True):
+				print '[!] You are chosing extraonly mode...'
 		else:
-			if options.extraonly == False:
+			extra = []
+
+		if (mode == 2):
+			if extraonly == False:
 				print '[!] You are chosing slow mode...'
-		res = Permutation(options.params.split(','), options.mode)
-		res.addSplitStr(options.extra.split(','), options.extraonly, options.mode)
-	except:
+		else:
+			mode = 1
+			if extraonly == False:
+				print '[!] You are chosing fast mode...'
+
+		res = Permutation(param.split(','), mode)
+		res.addSplitStr(extra, extraonly, mode)
+	except Exception as e:
+		print e.message
 		print 'You didn\'t input all the parameters correctly'
 		exit(0)
+
 
 	payloads = res.getResult()
 	hashes = getHashes(payloads)
@@ -186,6 +205,8 @@ if __name__ == '__main__':
 		print '	1--detailed mode'
 		print '	2--comprehensive mode'
 		exit(0)
+
+
 	print '[!] Collision is about to start, please fasten your seat belts!'
 	if(options.verbose == 0):
 		for key, value in hashes.iteritems():
