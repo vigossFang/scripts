@@ -38,13 +38,13 @@
   		-h, --help            	show this help message and exit
   		-d DOMAIN, --domain=DOMAIN 						
 					Domain name to test
-  		-f FILE, --file=FILE  File contains domain names
+  		-f FILE, --file=FILE  	File contains domain names
   		-c COLLABORATOR, --collaborator=COLLABORATOR
                         		Collaborator server address
   		-t THREADS, --threads=THREADS
                         		specify threads to run
   		--timeout=TIMEOUT     	specify timeout for HTTP/HTTPS connection, default is
-                        10
+                        		10
   		-p PORT, --port=PORT  	specify a port for HTTP/HTTPS connection, default is
                         		80(HTTP) and 443(HTTPS)
   		-v, --verbose         	show verbose messages
