@@ -21,13 +21,17 @@ def fire(domain, schema, port, timeout, method, url, body, headers):
     response = None
     try:
         time = 5
-        while(response == None or response.status == 301 or response.status == 302):
-            if (response != None) and (response.status == 301 or response.status == 302):
+        while(response == None or response.status in (301,302,303,304,305,306,307,308,309,310)):
+            if (response != None and response.status in (301,302,303,304,305,306,307,308,309,310)):
                 try:
                     (schema, domain, port) = getparamsfromredirection(response.getheader("Location"), schema)
+
+                    if 'burpcollaborator.net' in domain.lower():
+                        raise Exception
+
                 except Exception,e:
                     print e.message
-                    print '[!] The domain returns a nonstardard redirection location header, parse failed !'
+                    print '[!] The domain returns a nonstardard redirection location header or return a origin host header, mayby NOT Vulnerable !'
                     raise Exception
             if schema.lower() == 'http':
                 conn = httplib.HTTPConnection(domain, port=port, timeout=timeout)
@@ -156,12 +160,10 @@ def isvalidhttpdomain(domain,port=80,timeout=10):
         conn = httplib.HTTPConnection(domain, port, timeout=timeout)
         conn.request("GET","/")
         res = conn.getresponse()
-        if res.status == 200 and res.read().index('activity/dnserror') > 0:
+        if res.status == 200 and 'activity/dnserror' in res.read():
             return False
         else:
             return True
-    except ValueError,e:
-        return True
     except Exception,e:
         print e.message
         return False
@@ -172,12 +174,10 @@ def isvalidhttpsdomain(domain, port=443, timeout=10):
         conn = httplib.HTTPSConnection(domain, port, timeout=timeout)
         conn.request("GET","/")
         res = conn.getresponse()
-        if res.status == 200 and res.read().index('activity/dnserror') > 0:
+        if res.status == 200 and 'activity/dnserror' in res.read():
             return False
         else:
             return True
-    except ValueError,e:
-        return True
     except Exception,e:
         print e.message
         return False
