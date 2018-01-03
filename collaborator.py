@@ -30,7 +30,6 @@ def fire(domain, schema, port, timeout, method, url, body, headers):
                         raise Exception
 
                 except Exception,e:
-                    print e.message
                     print '[!] The domain returns a nonstardard redirection location header or return a origin host header, mayby NOT Vulnerable !'
                     raise Exception
             if schema.lower() == 'http':
@@ -55,7 +54,6 @@ def fire(domain, schema, port, timeout, method, url, body, headers):
                 raise Exception
         return response
     except Exception, e:
-        print e.message
         return False
     finally:
         conn.close()
@@ -165,7 +163,6 @@ def isvalidhttpdomain(domain,port=80,timeout=10):
         else:
             return True
     except Exception,e:
-        print e.message
         return False
 
 
@@ -179,23 +176,23 @@ def isvalidhttpsdomain(domain, port=443, timeout=10):
         else:
             return True
     except Exception,e:
-        print e.message
         return False
 
 def armAndLaunch(domainName, collaboratorServerAddress, port, timeout=10, verbose=False):
+    global validhttpcount
+    global validhttpscount
+
     if port == None:
         if isvalidhttpdomain(domainName, 80, timeout):
             loadHeadersAndLaunch(domainName, collaboratorServerAddress, 'http', 80, timeout, verbose)
             modifyHostAndLaunch(domainName, collaboratorServerAddress, 'http', 80, timeout, verbose)
             malformedUriAndLaunch(domainName, collaboratorServerAddress, 'http', 80, timeout, verbose)
-            global validhttpcount
             validhttpcount += 1
     else:
         if isvalidhttpdomain(domainName, port, timeout):
             loadHeadersAndLaunch(domainName, collaboratorServerAddress, 'http', port, timeout, verbose)
             modifyHostAndLaunch(domainName, collaboratorServerAddress, 'http', port, timeout, verbose)
             malformedUriAndLaunch(domainName, collaboratorServerAddress, 'http', port, timeout, verbose)
-            global validhttpcount
             validhttpcount += 1
 
 
@@ -204,14 +201,12 @@ def armAndLaunch(domainName, collaboratorServerAddress, port, timeout=10, verbos
             loadHeadersAndLaunch(domainName, collaboratorServerAddress, 'https', 443, timeout, verbose)
             modifyHostAndLaunch(domainName, collaboratorServerAddress, 'https', 443, timeout, verbose)
             malformedUriAndLaunch(domainName, collaboratorServerAddress, 'https', 443, timeout, verbose)
-            global validhttpscount
             validhttpscount += 1
     else:
         if isvalidhttpsdomain(domainName, port, timeout):
             loadHeadersAndLaunch(domainName, collaboratorServerAddress, 'https', port, timeout, verbose)
             modifyHostAndLaunch(domainName, collaboratorServerAddress, 'https', port, timeout, verbose)
             malformedUriAndLaunch(domainName, collaboratorServerAddress, 'https', port, timeout, verbose)
-            global validhttpscount
             validhttpscount += 1
 
     global count
