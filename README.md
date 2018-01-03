@@ -48,3 +48,11 @@
   		-p PORT, --port=PORT  	specify a port for HTTP/HTTPS connection, default is
                         		80(HTTP) and 443(HTTPS)
   		-v, --verbose         	show verbose messages
+
+
+  		e.g.
+  		G:\python\bash>python collaborator.py -d www.baidu.com -c 87dq4pydqrjm09twyzu3gj
+		wzaqgi47.burpcollaborator.net
+		[+] Script done, scaned 1 domains !
+		[+] Valid http domain is 1
+		[+] Valid https domain is 1
