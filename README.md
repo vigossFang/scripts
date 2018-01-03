@@ -51,7 +51,7 @@
 
 
   		e.g.
-  		G:\python\bash>python collaborator.py -d www.baidu.com -c sds
+  		G:\python\bash>python collaborator.py -d www.baidu.com -c qqkffsb42zuiorlswzse5byy1p7jv8.burpcollaborator.net
 		[!] GET method firing at www.baidu.com with multi http headers
 		[!] POST method firing at www.baidu.com with multi http headers
 		[!] Firing at www.baidu.com with modified host header
@@ -63,4 +63,5 @@
 		[+] Script done, scaned 1 domains !
 		[+] Valid http domain is 1
 		[+] Valid https domain is 1
+
 
